@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { fetchBooks, fetchAuthorDetails } from '../services/bookService';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TablePagination, Paper, CircularProgress } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TablePagination, Paper, CircularProgress, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material';
 import SearchBar from './SearchBar';
+import { CSVLink } from 'react-csv';
+
+const headers = [
+  { label: 'Title', key: 'title' },
+  { label: 'Author', key: 'authorDetails.name' },
+  { label: 'First Publish Year', key: 'first_publish_year' },
+  { label: 'Ratings Average', key: 'ratings_average' },
+  { label: 'Subject', key: 'subject' },
+  { label: 'Author Birth Date', key: 'authorDetails.birth_date' },
+  { label: 'Author Top Work', key: 'authorDetails.top_work' }
+];
 
 const BookTable = () => {
   const [books, setBooks] = useState([]);
@@ -12,6 +23,8 @@ const BookTable = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,6 +67,20 @@ const BookTable = () => {
     setSearchQuery(query);
   };
 
+  const handleEditClick = (book) => {
+    setSelectedBook(book);
+    setEditDialogOpen(true);
+  };
+
+  const handleEditChange = (field, value) => {
+    setSelectedBook({ ...selectedBook, [field]: value });
+  };
+
+  const handleEditSave = () => {
+    setBooks(books.map(book => (book.key === selectedBook.key ? selectedBook : book)));
+    setEditDialogOpen(false);
+  };
+
   if (loading) {
     return <CircularProgress />;
   }
@@ -65,6 +92,9 @@ const BookTable = () => {
   return (
     <div>
       <SearchBar onSearch={handleSearch} />
+      <CSVLink data={books} headers={headers} filename="books.csv">
+        <Button>Download CSV</Button>
+      </CSVLink>
       <Paper>
         <TableContainer>
           <Table>
@@ -97,6 +127,7 @@ const BookTable = () => {
                 </TableCell>
                 <TableCell>Author Birth Date</TableCell>
                 <TableCell>Author Top Work</TableCell>
+                <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -109,6 +140,9 @@ const BookTable = () => {
                   <TableCell>{book.subject ? book.subject.join(', ') : 'N/A'}</TableCell>
                   <TableCell>{book.authorDetails.birth_date || 'N/A'}</TableCell>
                   <TableCell>{book.authorDetails.top_work || 'N/A'}</TableCell>
+                  <TableCell>
+                    <Button onClick={() => handleEditClick(book)}>Edit</Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -124,11 +158,73 @@ const BookTable = () => {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
+
+      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
+        <DialogTitle>Edit Book</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Edit the details of the book.</DialogContentText>
+          <TextField
+            margin="dense"
+            label="Title"
+            fullWidth
+            value={selectedBook?.title || ''}
+            onChange={(e) => handleEditChange('title', e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="Author"
+            fullWidth
+            value={selectedBook?.authorDetails.name || ''}
+            onChange={(e) => handleEditChange('author', e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="First Publish Year"
+            fullWidth
+            value={selectedBook?.first_publish_year || ''}
+            onChange={(e) => handleEditChange('first_publish_year', e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="Ratings Average"
+            fullWidth
+            value={selectedBook?.ratings_average || ''}
+            onChange={(e) => handleEditChange('ratings_average', e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="Subject"
+            fullWidth
+            value={selectedBook?.subject ? selectedBook.subject.join(', ') : ''}
+            onChange={(e) => handleEditChange('subject', e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="Author Birth Date"
+            fullWidth
+            value={selectedBook?.authorDetails.birth_date || ''}
+            onChange={(e) => handleEditChange('birth_date', e.target.value)}
+          />
+          <TextField
+            margin="dense"
+            label="Author Top Work"
+            fullWidth
+            value={selectedBook?.authorDetails.top_work || ''}
+            onChange={(e) => handleEditChange('top_work', e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleEditSave}>Save</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
 
 export default BookTable;
+
+
 
 
 
