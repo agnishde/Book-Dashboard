@@ -151,7 +151,7 @@ const BookTable = () => {
         <TablePagination
           rowsPerPageOptions={[10, 50, 100]}
           component="div"
-          count={100} // This should ideally come from the API response
+          count={100} 
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}

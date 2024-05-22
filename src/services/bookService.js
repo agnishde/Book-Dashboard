@@ -16,7 +16,7 @@ export const fetchAuthorDetails = async (authorName) => {
     return response.data.docs[0] || {}; 
   } catch (error) {
     console.error('Error fetching author details:', error);
-    return {}; // Return an empty object in case of error
+    return {}; 
   }
 };
 
