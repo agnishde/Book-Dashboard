@@ -12,11 +12,13 @@ export const fetchBooks = async (page = 1, limit = 10) => {
 
 export const fetchAuthorDetails = async (authorKey) => {
   try {
-    const response = await axios.get(`https://openlibrary.org/authors/${authorKey}.json`);
+    const response = await axios.get(`https://openlibrary.org${authorKey}.json`);
     return response.data;
   } catch (error) {
     console.error('Error fetching author details:', error);
     return {}; // Return an empty object in case of error
   }
 };
+
+
 

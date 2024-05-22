@@ -19,6 +19,7 @@ const BookTable = () => {
       setError(null);
       try {
         const data = await fetchBooks(page + 1, rowsPerPage);
+        console.log(data);  // Log the fetched data
         const booksWithAuthorDetails = await Promise.all(
           data.map(async (book) => {
             const authorDetails = await fetchAuthorDetails(book.authors[0].key);
@@ -154,5 +155,8 @@ const BookTable = () => {
 };
 
 export default BookTable;
+
+
+
 
 
