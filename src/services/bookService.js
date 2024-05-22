@@ -1,24 +1,25 @@
 import axios from 'axios';
 
-export const fetchBooks = async (page = 1, limit = 10) => {
+export const fetchBooks = async (query, page = 1, limit = 10) => {
   try {
-    const response = await axios.get(`https://openlibrary.org/works.json?page=${page}&limit=${limit}`);
-    return response.data.entries || []; // Ensure it returns an array
+    const response = await axios.get(`https://openlibrary.org/search.json?q=${query}&page=${page}&limit=${limit}`);
+    return response.data.docs || []; 
   } catch (error) {
     console.error('Error fetching books:', error);
-    return []; // Return an empty array in case of error
+    return []; 
   }
 };
 
-export const fetchAuthorDetails = async (authorKey) => {
+export const fetchAuthorDetails = async (authorName) => {
   try {
-    const response = await axios.get(`https://openlibrary.org${authorKey}.json`);
-    return response.data;
+    const response = await axios.get(`https://openlibrary.org/search/authors.json?q=${authorName}`);
+    return response.data.docs[0] || {}; 
   } catch (error) {
     console.error('Error fetching author details:', error);
     return {}; // Return an empty object in case of error
   }
 };
+
 
 
 

@@ -18,11 +18,10 @@ const BookTable = () => {
       setLoading(true);
       setError(null);
       try {
-        const data = await fetchBooks(page + 1, rowsPerPage);
-        console.log(data);  // Log the fetched data
+        const data = await fetchBooks(searchQuery, page + 1, rowsPerPage);
         const booksWithAuthorDetails = await Promise.all(
           data.map(async (book) => {
-            const authorDetails = await fetchAuthorDetails(book.authors[0].key);
+            const authorDetails = await fetchAuthorDetails(book.author_name[0]);
             return { ...book, authorDetails };
           })
         );
@@ -34,32 +33,7 @@ const BookTable = () => {
     };
 
     fetchData();
-  }, [page, rowsPerPage]);
-
-  useEffect(() => {
-    if (searchQuery) {
-      const fetchData = async () => {
-        setLoading(true);
-        setError(null);
-        try {
-          const data = await fetchBooks(1, rowsPerPage); // Fetch all books and then filter
-          const booksWithAuthorDetails = await Promise.all(
-            data.map(async (book) => {
-              const authorDetails = await fetchAuthorDetails(book.authors[0].key);
-              return { ...book, authorDetails };
-            })
-          );
-          const filteredBooks = booksWithAuthorDetails.filter(book => book.authorDetails.name.toLowerCase().includes(searchQuery.toLowerCase()));
-          setBooks(filteredBooks);
-        } catch (error) {
-          setError('Failed to fetch books');
-        }
-        setLoading(false);
-      };
-
-      fetchData();
-    }
-  }, [searchQuery, rowsPerPage]);
+  }, [page, rowsPerPage, searchQuery]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
